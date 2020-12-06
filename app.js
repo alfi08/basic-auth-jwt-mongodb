@@ -36,82 +36,85 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello 😁😁" });
 });
 
-// auto login
-app.get("/auto-login", isAuth, (req, res) => {
-  User.findById(req.user.id)
-    .select("-password")
-    .then((doc) => {
-      res.json(doc);
-    });
-});
+const usersRoute = require("./routes/usersRoute");
+app.use("/api/users", usersRoute);
 
-// login
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+// // auto login
+// app.get("/auto-login", isAuth, (req, res) => {
+//   User.findById(req.user.id)
+//     .select("-password")
+//     .then((doc) => {
+//       res.json(doc);
+//     });
+// });
 
-  console.log("==>", req.body);
+// // login
+// app.post("/login", (req, res) => {
+//   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ msg: "failed!" });
-  }
+//   console.log("==>", req.body);
 
-  User.findOne({ email: email }).then((doc) => {
-    if (!doc)
-      return res.status(400).json({ msg: "email or password is invalid" });
+//   if (!email || !password) {
+//     return res.status(400).json({ msg: "failed!" });
+//   }
 
-    console.log(`doc => ${doc}| password : ${password}`);
-    bcrypt.compare(password, doc.password).then((isPasswordMatch) => {
-      if (isPasswordMatch) {
-        jwt.sign({ id: doc._id }, "rahasia", (err, token) => {
-          if (err) throw err;
-          res.json({
-            msg: "login success ",
-            user: { email: doc.email, id: doc._id },
-            token,
-          });
-        });
-      } else {
-        res.status(400).json({ msg: "email or password is invalid" });
-      }
-    });
-  });
-});
+//   User.findOne({ email: email }).then((doc) => {
+//     if (!doc)
+//       return res.status(400).json({ msg: "email or password is invalid" });
 
-// register
-app.post("/register", (req, res) => {
-  const { email, password } = req.body;
+//     console.log(`doc => ${doc}| password : ${password}`);
+//     bcrypt.compare(password, doc.password).then((isPasswordMatch) => {
+//       if (isPasswordMatch) {
+//         jwt.sign({ id: doc._id }, "rahasia", (err, token) => {
+//           if (err) throw err;
+//           res.json({
+//             msg: "login success ",
+//             user: { email: doc.email, id: doc._id },
+//             token,
+//           });
+//         });
+//       } else {
+//         res.status(400).json({ msg: "email or password is invalid" });
+//       }
+//     });
+//   });
+// });
 
-  console.log("==>", req.body);
+// // register
+// app.post("/register", (req, res) => {
+//   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ msg: "failed!" });
-  }
+//   console.log("==>", req.body);
 
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) throw err;
+//   if (!email || !password) {
+//     return res.status(400).json({ msg: "failed!" });
+//   }
 
-    // cek user
-    User.findOne({ email: email }).then((doc) => {
-      // cek jika email udah terdaftar
-      if (doc)
-        return res.status(400).json({ message: "email is already exist" });
+//   bcrypt.genSalt(10, (err, salt) => {
+//     if (err) throw err;
 
-      // hash password
-      bcrypt.hash(password, salt, (err, passHash) => {
-        if (err) throw err;
+//     // cek user
+//     User.findOne({ email: email }).then((doc) => {
+//       // cek jika email udah terdaftar
+//       if (doc)
+//         return res.status(400).json({ message: "email is already exist" });
 
-        new User({
-          email: email,
-          password: passHash,
-        })
-          .save()
-          .then((doc) => {
-            jwt.sign({ id: doc._id }, "rahasia", (err, token) => {
-              res.json({ message: "register success ", id: doc._id, token });
-            });
-          })
-          .catch((err) => console.log(err));
-      });
-    });
-  });
-});
+//       // hash password
+//       bcrypt.hash(password, salt, (err, passHash) => {
+//         if (err) throw err;
+
+//         new User({
+//           email: email,
+//           password: passHash,
+//         })
+//           .save()
+//           .then((doc) => {
+//             jwt.sign({ id: doc._id }, "rahasia", (err, token) => {
+//               res.json({ message: "register success ", id: doc._id, token });
+//             });
+//           })
+//           .catch((err) => console.log(err));
+//       });
+//     });
+//   });
+// });
