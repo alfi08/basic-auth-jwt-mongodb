@@ -50,7 +50,12 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// @PUBLIC POST /users/register=>  register  users
+/***
+ * @PUBLIC
+ * @METHOD POST
+ * @ENDPOINT /users/register
+ * @DESC   register  users
+ **/
 router.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
